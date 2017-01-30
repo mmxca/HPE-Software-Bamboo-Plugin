@@ -28,37 +28,40 @@ public class MainClass {
         }
 
         RunKind rk = getRunKind(args[0]);
+        AbstractTask t;
         switch (rk) {
             case lep: {
-                try {
-                    System.out.println("ALM Lab Management Environment preparation task recognized");
-                    LabEnvPrepTask t = new LabEnvPrepTask();
-                    try {
-                        t.parseArgs(Arrays.copyOfRange(args, 1, args.length));
-                    }
-                    catch(Throwable th) {
-                        System.out.println("Parameter parsing FAILED with error: " + th.getMessage());
-                        System.exit(ExitCode_Error_FailedParseArgs);
-                    }
-                    try {
-                        t.execute();
-                    }
-                    catch(Throwable th) {
-                        System.out.println("Execution FAILED with error: " + th.getMessage());
-                        System.exit(ExitCode_Error_FailedExecute);
-                    }
-                }
-                catch (Throwable th) {
-                    System.out.println("Failed run with error: " + th.toString());
-                    System.exit(ExitCode_Error_TaskExecutionInnerException);
-                }
+                System.out.println("ALM Lab Management Environment preparation task recognized");
+                t = new LabEnvPrepTask();
                 break;
             }
-            case le: {
+            default:
+            case almlabmanagement: {
+                System.out.println("ALM Lab Management task recognized");
+                t = new AlmLabManagementTTask();
                 break;
             }
         }
-        System.exit(0);
+        try {
+            try {
+                t.parseArgs(Arrays.copyOfRange(args, 1, args.length));
+            }
+            catch(Throwable th) {
+                System.out.println("Parameter parsing FAILED with error: " + th.getMessage());
+                System.exit(ExitCode_Error_FailedParseArgs);
+            }
+            try {
+                t.execute();
+            }
+            catch(Throwable th) {
+                System.out.println("Execution FAILED with error: " + th.getMessage());
+                System.exit(ExitCode_Error_FailedExecute);
+            }
+        }
+        catch (Throwable th) {
+            System.out.println("Failed run with error: " + th.getMessage());
+            System.exit(ExitCode_Error_TaskExecutionInnerException);
+        }
     }
 
     private static RunKind getRunKind(String arg) {

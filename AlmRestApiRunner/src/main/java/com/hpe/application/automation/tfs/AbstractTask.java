@@ -24,4 +24,28 @@ public abstract class AbstractTask {
         }
         return arg.substring(pl);
     }
+
+    protected String GetStringParameter(String[] args, String prefix)
+    {
+        for(String parameter : args)
+        {
+            if(parameter.contains(prefix))
+            {
+                return  parameter.substring(prefix.length());
+            }
+        }
+        return  "";
+    }
+
+    protected boolean GetBoolParameter(String[] args, String prefix, boolean defaultValue)
+    {
+        for(String parameter : args)
+        {
+            if(parameter.contains(prefix))
+            {
+                return  Boolean.parseBoolean(args[10].toLowerCase());
+            }
+        }
+        return  defaultValue;
+    }
 }

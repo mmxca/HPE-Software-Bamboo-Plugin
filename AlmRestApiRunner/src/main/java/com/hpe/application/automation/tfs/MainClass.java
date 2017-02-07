@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 enum RunKind {
     lep,
-    le;
+    almlabmanagement;
 }
 
 public class MainClass {

@@ -117,7 +117,7 @@ public class LabEnvPrepTask extends AbstractTask {
                 throw new Exception("'Use as existing config with ID' parameter missing");
             }
             try {
-                this.UseAsConfId = Integer.valueOf(extractvalueFromParameter(args[9], "useasexisting:").toLowerCase());
+                this.UseAsConfId = Integer.valueOf(extractvalueFromParameter(args[9].toLowerCase(), "useasexisting:"));
             } catch (Throwable th) {
                 throw new Exception("Failed to parse 'Use as existing config with ID' parameter (use unsigned integer value with 'useasexisting:' prefix)");
             }

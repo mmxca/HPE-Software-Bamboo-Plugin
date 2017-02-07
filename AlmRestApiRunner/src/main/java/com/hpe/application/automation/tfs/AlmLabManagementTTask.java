@@ -7,6 +7,13 @@ import com.hpe.application.automation.tools.common.sdk.Args;
 import com.hpe.application.automation.tools.common.sdk.Logger;
 import com.hpe.application.automation.tools.common.sdk.RunManager;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
+import org.apache.commons.io.FileUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AlmLabManagementTTask extends AbstractTask {
     private String AlmServ; //Required
     private String UserName; //Required
@@ -22,6 +29,7 @@ public class AlmLabManagementTTask extends AbstractTask {
     private String DeploymentAction = "";
     private String DeploymentEnvironmentName = "";
     private String DeprovisioningAction = "";
+    private String ReportFileName = "";
 
     public void parseArgs(String[] args) throws Exception {
 
@@ -57,6 +65,7 @@ public class AlmLabManagementTTask extends AbstractTask {
         DeploymentAction = GetStringParameter(args, "deploymentAction:");
         DeploymentEnvironmentName = GetStringParameter(args, "depEnvName:");
         DeprovisioningAction = GetStringParameter(args, "deprovisioningAction:");
+        ReportFileName = GetStringParameter(args, "repname:");
     }
 
     public void execute() throws Throwable {
@@ -73,8 +82,42 @@ public class AlmLabManagementTTask extends AbstractTask {
 
         RestClient restClient = new RestClient(AlmServ, Domain, Project, UserName);
 
-        RestLogger logger = new RestLogger();
+        //RestLogger logger = new RestLogger();
+        final StringBuilder sb = new StringBuilder(10000);
+        Logger logger = new Logger() {
 
+            public void log(String message) {
+                System.out.println(message);
+                sb.append(message);
+            }
+        };
         Testsuites result = runManager.execute(restClient, args, logger);
+
+        createResultFile(sb.toString());
+    }
+
+    //link example^ http://mydphdb0140.hpeswlab.net:8080/qcbin/webui/alm/denis/Project_1/lab/index.jsp?processRunId=1013
+
+    private void createResultFile(String log) {
+        if (ReportFileName == null || ReportFileName.isEmpty()) {
+            return;
+        }
+        try {
+            String workingDirectory = Paths.get(AlmLabManagementTTask.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent().getParent().toString();
+            workingDirectory = Paths.get(workingDirectory, "res").toString();
+            File resultFile = new File(Paths.get(workingDirectory, ReportFileName).toString());
+            Pattern p = Pattern.compile("http://.+?processRunId=([0-9]+)");
+            Matcher m = p.matcher(log);
+            if (!m.find()) {
+                return;
+            }
+            //PrintWriter writer = new PrintWriter(resultFile, "UTF-8");
+            //writer.println("[Report " + m.group(1) + "](" + m.group(0) + ")  ");
+            //writer.close();
+
+            FileUtils.writeStringToFile(resultFile, String.format("[Report %s](%s)  ", m.group(1), m.group()));
+        }
+        catch(Throwable th) {
+        }
     }
 }

@@ -1,11 +1,15 @@
 package com.hpe.application.automation.tfs;
 
+import com.hpe.application.automation.tools.common.StringUtils;
 import com.hpe.application.automation.tools.common.model.AutEnvironmentConfigModel;
 import com.hpe.application.automation.tools.common.model.AutEnvironmentParameterModel;
 import com.hpe.application.automation.tools.common.model.AutEnvironmentParameterType;
 import com.hpe.application.automation.tools.common.rest.RestClient;
 import com.hpe.application.automation.tools.common.sdk.AUTEnvironmentBuilderPerformer;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +37,11 @@ public class LabEnvPrepTask extends AbstractTask {
     private int EnvId;
     private EnvConfigAction Action;
     private String NewConfName;
-    private String AssignAutConfTo;
+//    private String AssignAutConfTo;
     private int UseAsConfId;
     private String PathToJSON;
     private boolean ParamOnlyFirst;
     private List<AutEnvironmentParameterModel> AutEnvironmentParameters = new ArrayList<AutEnvironmentParameterModel>();
-//    private EnvParamType ParamType;
-//    private String ParamName;
-//    private String ParamValue;
 
     public void parseArgs(String[] args) throws Exception {
         if (args.length < 1) {
@@ -102,15 +103,15 @@ public class LabEnvPrepTask extends AbstractTask {
             throw new Exception("Failed to extract 'Create new configuration named' parameter (use 'newnamed:' prefix)");
         }
 
-        if (args.length < 9) {
-            throw new Exception("'Assign AUT Environment...' parameter missing");
-        }
-        try {
-            this.AssignAutConfTo = extractvalueFromParameter(args[8], "assign:");
-        }
-        catch (Throwable th) {
-            throw new Exception("Failed to extract 'Assign AUT Environment...' parameter (use 'assign:' prefix)");
-        }
+//        if (args.length < 9) {
+//            throw new Exception("'Assign AUT Environment...' parameter missing");
+//        }
+//        try {
+//            this.AssignAutConfTo = extractvalueFromParameter(args[8], "assign:");
+//        }
+//        catch (Throwable th) {
+//            throw new Exception("Failed to extract 'Assign AUT Environment...' parameter (use 'assign:' prefix)");
+//        }
 
         if (this.Action == EnvConfigAction.existing) {
             if (args.length < 10) {
@@ -159,33 +160,10 @@ public class LabEnvPrepTask extends AbstractTask {
             AutEnvironmentParameters.add(new AutEnvironmentParameterModel(paramName, paramValue, type, this.ParamOnlyFirst));
             i++;
         }
-//        if (args.length < 13) {
-//            throw new Exception("'Parameter type' parameter missing");
-//        }
-//        try {
-//            this.ParamType = Enum.valueOf(EnvParamType.class, args[12].toLowerCase());
-//        }
-//        catch (Throwable th) {
-//            throw new Exception("Failed to parse 'Parameter type' parameter (use 'fromjson' or 'environment' or 'manual' value)");
-//        }
-//
-//        if (args.length < 14) {
-//            throw new Exception("'Parameter name' parameter missing");
-//        }
-//        this.ParamName = args[13];
-//
-//        if (args.length < 15) {
-//            throw new Exception("'Parameter value' parameter missing");
-//        }
-//        this.ParamValue = args[14];
     }
 
     public void execute() throws Throwable {
         boolean useExistingAutEnvConf = Action == Action.existing;
-
-//        for(AlmConfigParameter prm: AlmLabEnvPrepareTaskConfigurator.fetchAlmParametersFromContext(confMap))
-//        {
-//        }
 
         RestClient restClient = new RestClient(AlmServ, Domain, Project, UserName);
 
@@ -201,16 +179,12 @@ public class LabEnvPrepTask extends AbstractTask {
                 PathToJSON,
                 AutEnvironmentParameters);
 
-            AUTEnvironmentBuilderPerformer performer = new AUTEnvironmentBuilderPerformer(restClient, new RestLogger(), autEnvModel);
-            performer.start();
+        AUTEnvironmentBuilderPerformer performer = new AUTEnvironmentBuilderPerformer(restClient, new RestLogger(), autEnvModel);
+        performer.start();
 
-//            String outputConfig = AssignAutConfTo;
-//
-//            if (!StringUtils.isNullOrEmpty(outputConfig)) {
-//
-//                String confId = autEnvModel.getCurrentConfigID();
-//                variableService.saveGlobalVariable(outputConfig, confId);
-//            }
+        String workingDirectory = Paths.get(AlmLabManagementTTask.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent().getParent().toString();
+        File resultFile = new File(Paths.get(workingDirectory, "res", "updateVariable.txt").toString());
+        FileUtils.writeStringToFile(resultFile, autEnvModel.getCurrentConfigID());
     }
 
     private AutEnvironmentParameterType convertType(EnvParamType sourceType) {

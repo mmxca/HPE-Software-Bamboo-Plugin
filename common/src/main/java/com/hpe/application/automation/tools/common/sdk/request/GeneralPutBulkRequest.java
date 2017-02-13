@@ -21,7 +21,7 @@
  */
 package com.hpe.application.automation.tools.common.sdk.request;
 
-import com.hpe.application.automation.tools.common.rest.HttpHeaders;
+import com.hpe.application.automation.tools.common.rest.RESTConstants;
 import com.hpe.application.automation.tools.common.RestXmlUtils;
 import com.hpe.application.automation.tools.common.sdk.Client;
 import com.hpe.application.automation.tools.common.sdk.ResourceAccessLevel;
@@ -46,15 +46,15 @@ public abstract class GeneralPutBulkRequest extends GeneralRequest {
     protected Map<String, String> getHeaders() {
 
         Map<String, String> ret = new HashMap<String, String>();
-        ret.put(HttpHeaders.CONTENT_TYPE, RestXmlUtils.APP_XML_BULK);
-        ret.put(HttpHeaders.ACCEPT, RestXmlUtils.APP_XML);
+        ret.put(RESTConstants.CONTENT_TYPE, RESTConstants.APP_XML_BULK);
+        ret.put(RESTConstants.ACCEPT, RESTConstants.APP_XML);
 
         return ret;
     }
     
     @Override
     protected Response perform() {
-        return client.httpPut(
+        return _client.httpPut(
                 getUrl(),
                 getDataBytes(),
                 getHeaders(),

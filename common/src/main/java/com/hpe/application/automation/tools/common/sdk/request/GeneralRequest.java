@@ -21,8 +21,8 @@
  */
 package com.hpe.application.automation.tools.common.sdk.request;
 
-import com.hpe.application.automation.tools.common.sdk.Response;
 import com.hpe.application.automation.tools.common.sdk.Client;
+import com.hpe.application.automation.tools.common.sdk.Response;
 
 import java.util.Map;
 
@@ -31,10 +31,11 @@ import java.util.Map;
  */
 public abstract class GeneralRequest {
     
-    protected final Client client;
+    protected final Client _client;
     
     protected GeneralRequest(Client client) {
-        this.client = client;
+
+        _client = client;
     }
     
     public final Response execute() {
@@ -67,7 +68,6 @@ public abstract class GeneralRequest {
     
     protected String getUrl() {
         
-        return client.buildRestRequest(getSuffix());
+        return _client.buildRestRequest(getSuffix());
     }
-    
 }

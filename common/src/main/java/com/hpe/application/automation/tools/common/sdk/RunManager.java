@@ -19,7 +19,6 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-
 package com.hpe.application.automation.tools.common.sdk;
 
 import com.hpe.application.automation.tools.common.SSEException;
@@ -31,25 +30,24 @@ import com.hpe.application.automation.tools.common.sdk.handler.PollHandler;
 import com.hpe.application.automation.tools.common.sdk.handler.PollHandlerFactory;
 import com.hpe.application.automation.tools.common.sdk.handler.RunHandler;
 import com.hpe.application.automation.tools.common.sdk.handler.RunHandlerFactory;
-import com.hpe.application.automation.tools.common.sdk.request.CreateSiteSessionRequest;
 
 /**
- * 
+ *
  * @author Effi Bar-She'an
  * @author Dani Schreiber
- * 
+ *
  */
 public class RunManager {
-    
+
     private RunHandler _runHandler;
     private PollHandler _pollHandler;
     private Logger _logger;
     private boolean _running = false;
     private boolean _polling = false;
-    
+
     public Testsuites execute(RestClient client, Args args, Logger logger)
             throws InterruptedException {
-        
+
         Testsuites ret = null;
         _logger = logger;
         _running = true;
@@ -73,39 +71,39 @@ public class RunManager {
                 _polling = false;
             }
         }
-        
+
         return ret;
     }
-    
-    public RunHandler getRunHandler() {
-        
-        return _runHandler;
-    }
-    
+
     private void initialize(Args args, RestClient client) {
-        
+
         String entityId = args.getEntityId();
         appendQCSessionCookies(client);
         _runHandler = new RunHandlerFactory().create(client, args.getRunType(), entityId);
         _pollHandler = new PollHandlerFactory().create(client, args.getRunType(), entityId);
     }
-    
+
     private void appendQCSessionCookies(RestClient client) {
-        
+
         // issue a post request so that cookies relevant to the QC Session will be added to the RestClient
-        Response response = new CreateSiteSessionRequest(client).execute();
+        Response response =
+                client.httpPost(
+                        client.build("rest/site-session"),
+                        null,
+                        null,
+                        ResourceAccessLevel.PUBLIC);
         if (!response.isOk()) {
-            throw new SSEException("Cannot append session cookies", response.getFailure());
+            throw new SSEException("Cannot appned QCSession cookies", response.getFailure());
         }
     }
-    
+
     private boolean poll() throws InterruptedException {
-        
+
         return _pollHandler.poll(_logger);
     }
-    
+
     public void stop() {
-        
+
         _logger.log("Stopping run...");
         if (_runHandler != null) {
             _runHandler.stop();
@@ -115,9 +113,9 @@ public class RunManager {
             _polling = false;
         }
     }
-    
+
     private boolean login(Client client, Args args) {
-        
+
         boolean ret = true;
         try {
             ret =
@@ -133,12 +131,12 @@ public class RunManager {
                     args.getUrl(),
                     cause.getMessage()));
         }
-        
+
         return ret;
     }
-    
+
     private boolean start(Args args) {
-        
+
         boolean ret = false;
         Response response =
                 _runHandler.start(
@@ -153,27 +151,26 @@ public class RunManager {
                 ret = true;
             }
         }
-        log(ret, args);
-        
+        logReportUrl(ret, args);
+
         return ret;
     }
-    
+
     private void setRunId(RunResponse runResponse) {
-        
+
         String runId = runResponse.getRunId();
         if (StringUtils.isNullOrEmpty(runId)) {
-            _logger.log("Empty run ID");
+            _logger.log("No run ID");
+            throw new SSEException("No run ID");
         } else {
             _runHandler.setRunId(runId);
             _pollHandler.setRunId(runId);
         }
-        
     }
-    
-    private void log(boolean isSucceeded, Args args) {
-        
+
+    private void logReportUrl(boolean isSucceeded, Args args) {
+
         if (isSucceeded) {
-            _runHandler.setRunId(_runHandler.getRunId());
             _logger.log(String.format(
                     "%s run report for run id %s is at: %s",
                     args.getRunType(),
@@ -190,14 +187,14 @@ public class RunManager {
                     _runHandler.getRunId()));
         }
     }
-    
+
     private RunResponse getRunResponse(Response response) {
-        
+
         return _runHandler.getRunResponse(response);
     }
-    
+
     private boolean isOk(Response response, Args args) {
-        
+
         boolean ret = false;
         if (response.isOk()) {
             _logger.log(String.format(
@@ -227,18 +224,18 @@ public class RunManager {
                         response.getStatusCode()));
             }
         }
-        
+
         return ret;
     }
-    
+
     public boolean getRunning() {
-        
+
         return _running;
     }
-    
+
     public boolean getPolling() {
-        
+
         return _polling;
     }
-    
+
 }

@@ -19,10 +19,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
+
 package com.hpe.application.automation.tools.common.sdk.request;
 
-import com.hpe.application.automation.tools.common.rest.HttpHeaders;
-import com.hpe.application.automation.tools.common.RestXmlUtils;
+import com.hpe.application.automation.tools.common.rest.RESTConstants;
 import com.hpe.application.automation.tools.common.sdk.Client;
 
 import java.util.HashMap;
@@ -38,14 +38,14 @@ public class CreateSiteSessionRequest extends GeneralPostRequest {
     @Override
     protected String getUrl() {
 
-        return client.build("rest/site-session");
+        return _client.build("rest/site-session");
     }
 
     @Override
     protected Map<String, String> getHeaders() {
 
         Map<String, String> ret = new HashMap<String, String>();
-        ret.put(HttpHeaders.CONTENT_TYPE, RestXmlUtils.TEXT_PLAIN);
+        ret.put(RESTConstants.CONTENT_TYPE, RESTConstants.TEXT_PLAIN);
 
         return ret;
     }

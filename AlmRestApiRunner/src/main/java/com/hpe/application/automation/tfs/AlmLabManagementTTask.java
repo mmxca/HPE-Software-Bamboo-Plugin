@@ -106,7 +106,7 @@ public class AlmLabManagementTTask extends AbstractTask {
             String workingDirectory = Paths.get(AlmLabManagementTTask.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent().getParent().toString();
             workingDirectory = Paths.get(workingDirectory, "res").toString();
             File resultFile = new File(Paths.get(workingDirectory, ReportFileName).toString());
-            Pattern p = Pattern.compile("http://.+?processRunId=([0-9]+)");
+            Pattern p = Pattern.compile("http://.+?execution-report#/test-set-report/([0-9]+)");
             Matcher m = p.matcher(log);
             if (!m.find()) {
                 return;

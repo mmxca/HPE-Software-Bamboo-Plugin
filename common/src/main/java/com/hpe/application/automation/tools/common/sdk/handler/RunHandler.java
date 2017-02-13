@@ -22,10 +22,7 @@
 package com.hpe.application.automation.tools.common.sdk.handler;
 
 import com.hpe.application.automation.tools.common.model.CdaDetails;
-import com.hpe.application.automation.tools.common.sdk.Args;
-import com.hpe.application.automation.tools.common.sdk.Client;
-import com.hpe.application.automation.tools.common.sdk.Response;
-import com.hpe.application.automation.tools.common.sdk.RunResponse;
+import com.hpe.application.automation.tools.common.sdk.*;
 import com.hpe.application.automation.tools.common.sdk.request.StartRunEntityRequest;
 import com.hpe.application.automation.tools.common.sdk.request.StopEntityRequest;
 
@@ -63,7 +60,7 @@ public abstract class RunHandler extends Handler {
     
     public String getReportUrl(Args args) {
         
-        return _client.buildWebUIRequest(String.format("lab/index.jsp?processRunId=%s", _runId));
+        return new ALMRunReportUrlBuilder().build(_client, _client.getServerUrl(), args.getDomain(), args.getProject(), _runId);
     }
     
     public RunResponse getRunResponse(Response response) {

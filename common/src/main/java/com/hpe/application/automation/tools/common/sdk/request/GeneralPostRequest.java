@@ -22,7 +22,7 @@
 package com.hpe.application.automation.tools.common.sdk.request;
 
 import com.hpe.application.automation.tools.common.Pair;
-import com.hpe.application.automation.tools.common.rest.HttpHeaders;
+import com.hpe.application.automation.tools.common.rest.RESTConstants;
 import com.hpe.application.automation.tools.common.RestXmlUtils;
 import com.hpe.application.automation.tools.common.sdk.Client;
 import com.hpe.application.automation.tools.common.sdk.ResourceAccessLevel;
@@ -46,8 +46,8 @@ public abstract class GeneralPostRequest extends GeneralRequest {
     protected Map<String, String> getHeaders() {
 
         Map<String, String> ret = new HashMap<String, String>();
-        ret.put(HttpHeaders.CONTENT_TYPE, RestXmlUtils.APP_XML);
-        ret.put(HttpHeaders.ACCEPT, RestXmlUtils.APP_XML);
+        ret.put(RESTConstants.CONTENT_TYPE, RESTConstants.APP_XML);
+        ret.put(RESTConstants.ACCEPT, RESTConstants.APP_XML);
 
         return ret;
     }
@@ -55,7 +55,7 @@ public abstract class GeneralPostRequest extends GeneralRequest {
     @Override
     public Response perform() {
         
-        return client.httpPost(
+        return _client.httpPost(
                 getUrl(),
                 getDataBytes(),
                 getHeaders(),
